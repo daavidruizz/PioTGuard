@@ -1,6 +1,7 @@
 #ifndef LCD1602_H
 #define LCD1602_H
 #include <stdint.h>
+// Editado por David Ruiz.
 //
 // LCD1602 2 line by 16 character LCD library
 //
@@ -21,6 +22,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+
+typedef struct {
+    int file_i2c;
+    int iBackLight;
+} LCD1602;
 
 //
 // Opens a file system handle to the I2C device
@@ -55,9 +61,10 @@ int lcd1602Clear(void);
 // close the I2C file handle
 //
 void lcd1602Shutdown(void);
+
 //
 // Crea un caracter personalizado
-//
+// Se almacena en la localizacion de la CGRAM 1..7
 //
 void lcd1602CreateChar(int location, char *charmap);
 

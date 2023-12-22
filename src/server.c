@@ -1,3 +1,4 @@
+// Main program for the PioTGuard-Server
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,7 +7,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "../lib/lcd1602.h"
-
+#define I2C_PORT 0x27
 
 static FILE *fp;
 
@@ -15,10 +16,9 @@ struct ControlThreadData {
     // Puedes agregar datos adicionales según sea necesario
 };
 
-// Prototipos de funciones
-void* controlLCD(void* data);
+void* lcdLoop(void* data);
 
-void handleCtrlC(int signum) {
+void handleSignal(int signum){
     printf("\nSe recibió la señal Ctrl+C (SIGINT). Saliendo...\n");
     lcd1602Shutdown();
     // Cerrar el archivo
@@ -26,15 +26,18 @@ void handleCtrlC(int signum) {
     exit(signum);
 }
 
+//====================================
+//==========CDONTROL LCD==============
+//====================================
 void* controlLCD(void* data){
+
     // Configurar el manejador de señal para Ctrl+C
-    if (signal(SIGINT, handleCtrlC) == SIG_ERR) {
+    if (signal(SIGINT, handleSignal) == SIG_ERR) {
         perror("Error al configurar el manejador de señal");
-        //return;
     }
     
+
     int rc = lcd1602Init(1, 0x27);
-	
     if (rc){
 		printf("Initialization failed; aborting...\n");
 		return 0;
@@ -87,6 +90,10 @@ void* controlLCD(void* data){
 } 
 
 int main(int argc, char *argv[]){
+    
+    // Manejo de señales kill -15
+    signal(SIGTERM, handleSignal);
+
     // Inicializar datos para el hilo de control
     struct ControlThreadData controlData;
     // Puedes configurar la estructura con los datos necesarios para el hilo de control
@@ -105,4 +112,4 @@ int main(int argc, char *argv[]){
     }
 
     return 0;
-} /* main() */
+}/* main() */

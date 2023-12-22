@@ -19,6 +19,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+// Editado por David Ruiz.
 
 #include <unistd.h>
 #include <stdio.h>
@@ -49,6 +50,62 @@
 static int iBackLight = BACKLIGHT;
 static int file_i2c = -1;
 
+char bell[8] = {
+  0x00,
+  0x04,
+  0x0E,
+  0x0E,
+  0x0E,
+  0x1F,
+  0x04,
+  0x00
+};
+
+char enabled[8] = {
+  0x0E,
+  0x11,
+  0x11,
+  0x1F,
+  0x1B,
+  0x1B,
+  0x1F,
+  0x00
+};
+
+char disabled[8] = {
+  0x0E,
+  0x10,
+  0x10,
+  0x1F,
+  0x1B,
+  0x1B,
+  0x1F,
+  0x00
+};
+
+char eyeL[8] = {
+  0x0E,
+  0x11,
+  0x11,
+  0x11,
+  0x1D,
+  0x1D,
+  0x1D,
+  0x0E
+};
+
+char eyeR[8] = {
+  0x0E,
+  0x11,
+  0x11,
+  0x11,
+  0x17,
+  0x17,
+  0x17,
+  0x0E
+};
+
+
 static void WriteCommand(unsigned char ucCMD)
 {
 unsigned char uc;
@@ -73,6 +130,34 @@ unsigned char uc;
 	usleep(CMD_PERIOD);
 
 } /* WriteCommand() */
+
+/* lcd1602CreateChar()*/
+void lcd1602CreateChar(int location, char *charmap){
+	if (file_i2c < 0 || charmap == NULL)
+		return;
+
+    if (location >= 0 && location < 8) { 
+        WriteCommand(0x40 | (location << 3)); // Address CGRAM
+        for (int i = 0; i < 8; i++) {
+            // Write each byte in two parts (4 bits each)
+            unsigned char ucCMD = iBackLight | DATA | (charmap[i] & 0xF0);
+            ucCMD |= 4; // Pulse E
+            write(file_i2c, &ucCMD, 1);
+            usleep(PULSE_PERIOD);
+            ucCMD &= ~4; // Toggle E
+            write(file_i2c, &ucCMD, 1);
+            usleep(PULSE_PERIOD);
+
+            ucCMD = iBackLight | DATA | ((charmap[i] << 4) & 0xF0);
+            ucCMD |= 4; // Pulse E
+            write(file_i2c, &ucCMD, 1);
+            usleep(PULSE_PERIOD);
+            ucCMD &= ~4; // Toggle E
+            write(file_i2c, &ucCMD, 1);
+            usleep(PULSE_PERIOD);
+        }
+    }
+}/* lcd1602CreateChar()*/
 
 //
 // Control the backlight, cursor, and blink
@@ -175,6 +260,12 @@ int rc;
 	WriteCommand(0x06); // inc cursor to right when writing and don't scroll
 	WriteCommand(0x80); // set cursor to row 1, column 1
 	lcd1602Clear();	    // clear the memory
+	lcd1602CreateChar(0x01, bell);
+	lcd1602CreateChar(0x02, enabled);
+	lcd1602CreateChar(0x03, disabled);
+	lcd1602CreateChar(0x04, eyeL);
+	lcd1602CreateChar(0x05, eyeR);
+	lcd1602Clear();	    // clear the memory
 
 	return 0;
 } /* lcd1602Init() */
@@ -203,37 +294,3 @@ void lcd1602Shutdown(void)
 	close(file_i2c);
 	file_i2c = -1;
 } /* lcd1602Shutdown() */
-
-
-// Función para enviar un carácter personalizado al LCD
-void lcd1602CreateChar(int location, char *charmap) 
-{
-    int i;
-
-	if (file_i2c < 0 || charmap == NULL)
-		return;
-
-    if (location >= 0 && location < 8) { 
-        WriteCommand(0x40 | (location << 3)); // Address CGRAM
-        for (i = 0; i < 8; i++) {
-            // Write each byte in two parts (4 bits each)
-            unsigned char ucCMD = iBackLight | DATA | (charmap[i] & 0xF0);
-            ucCMD |= 4; // Pulse E
-            write(file_i2c, &ucCMD, 1);
-            usleep(PULSE_PERIOD);
-            ucCMD &= ~4; // Toggle E
-            write(file_i2c, &ucCMD, 1);
-            usleep(PULSE_PERIOD);
-
-            ucCMD = iBackLight | DATA | ((charmap[i] << 4) & 0xF0);
-            ucCMD |= 4; // Pulse E
-            write(file_i2c, &ucCMD, 1);
-            usleep(PULSE_PERIOD);
-            ucCMD &= ~4; // Toggle E
-            write(file_i2c, &ucCMD, 1);
-            usleep(PULSE_PERIOD);
-        }
-    }
-}
-
-
