@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "../lib/lcd1602.h"
-#define I2C_PORT 0x27
+#include "../lib/mosquitto.h"
+#include "../lib/defines.h"
+#include "../lib/peripherals.h"
 
 static FILE *fp;
 
@@ -16,10 +18,8 @@ struct ControlThreadData {
     // Puedes agregar datos adicionales según sea necesario
 };
 
-void* lcdLoop(void* data);
-
 void handleSignal(int signum){
-    printf("\nSe recibió la señal Ctrl+C (SIGINT). Saliendo...\n");
+    printf("\nSaliendo...\n");
     lcd1602Shutdown();
     // Cerrar el archivo
     fclose(fp);
@@ -32,11 +32,13 @@ void handleSignal(int signum){
 void* controlLCD(void* data){
 
     // Configurar el manejador de señal para Ctrl+C
-    if (signal(SIGINT, handleSignal) == SIG_ERR) {
-        perror("Error al configurar el manejador de señal");
+    if (signal(SIGTERM, handleSignal) == SIG_ERR) {
+        perror("Exit. -15 Signal");
+    }else if(signal(SIGINT, handleSignal) == SIG_ERR){
+        perror("Exit. Ctrl+C");
     }
     
-
+    //====Inicializacion LCD=====
     int rc = lcd1602Init(1, 0x27);
     if (rc){
 		printf("Initialization failed; aborting...\n");
@@ -64,8 +66,7 @@ void* controlLCD(void* data){
     lcd1602SetCursor(0,0);
     int temp = -1;
 
-        char buf[32];
-
+    char buf[32];
     // Abrir el archivo que contiene la temperatura
     fp = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
     if (fp == NULL) {
@@ -73,7 +74,7 @@ void* controlLCD(void* data){
     }
 
     while(1){
-        sleep(1);
+        sleep(2);
         rewind(fp);
         // Leer la temperatura desde el archivo
         if (fgets(buf, sizeof(buf), fp) == NULL) {
@@ -87,7 +88,7 @@ void* controlLCD(void* data){
         fflush(fp);
     }
     return NULL;
-} 
+} /*controlLCD()*/
 
 int main(int argc, char *argv[]){
     
@@ -105,10 +106,11 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    int i = 0;
+    //Peripherals *ps;
+    //ps->mode
+
     while(1){
-        printf("Contando: %d\n",i);
-        sleep(1);
+
     }
 
     return 0;

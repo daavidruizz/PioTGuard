@@ -61,7 +61,7 @@ char bell[8] = {
   0x00
 };
 
-char enabled[8] = {
+char enableMap[8] = {
   0x0E,
   0x11,
   0x11,
@@ -72,7 +72,7 @@ char enabled[8] = {
   0x00
 };
 
-char disabled[8] = {
+char disableMap[8] = {
   0x0E,
   0x10,
   0x10,
@@ -261,8 +261,8 @@ int rc;
 	WriteCommand(0x80); // set cursor to row 1, column 1
 	lcd1602Clear();	    // clear the memory
 	lcd1602CreateChar(0x01, bell);
-	lcd1602CreateChar(0x02, enabled);
-	lcd1602CreateChar(0x03, disabled);
+	lcd1602CreateChar(0x02, enableMap);
+	lcd1602CreateChar(0x03, disableMap);
 	lcd1602CreateChar(0x04, eyeL);
 	lcd1602CreateChar(0x05, eyeR);
 	lcd1602Clear();	    // clear the memory

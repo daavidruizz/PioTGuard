@@ -34,7 +34,6 @@ void* controlLCD(void* data){
     }
     
     int rc = lcd1602Init(1, 0x27);
-	
     if (rc){
 		printf("Initialization failed; aborting...\n");
 		return 0;
@@ -99,10 +98,7 @@ int main(int argc, char *argv[]){
     }
 
     int i = 0;
-    while(1){
-        printf("Contando: %d\n",i);
-        sleep(1);
-    }
+    
 
     return 0;
 } /* main() */
