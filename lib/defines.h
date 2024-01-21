@@ -20,4 +20,24 @@
 #define enableMap 0x02
 #define disableMap 0x03
 
+
+//=====================
+//=====MQTT COMMS======
+//=======TOPICS========
+//=====================
+#define PORT 1883
+#define LOOPBACK "127.0.0.1"
+
+#define PIOT "/piot"
+#define CONFIG "/config"
+#define SENSORS "/sensor"
+#define APP "/APP"
+
+#define ENABLE_ALARM "/enable_alarm"
+#define DISABLE_ALARM "/disable_alarm"
+
+#define 
+
+
+
 #endif
