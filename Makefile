@@ -1,16 +1,21 @@
+TARGET = PioTGuard-Server
 CC = gcc
 CFLAGS = -Wall -pthread
 
-all: demo
+INCLUDES = -Ilib
+LIBS = -Llib -lmosquitto
 
-demo: src/server.o lib/lcd1602.o
-	$(CC) $^ $(LIBS) -o $@ -pthread
+SRCS = src/server.c
 
-src/main.o: src/server.c lib/lcd1602.h
-	$(CC) $(CFLAGS) -c $< -o $@
+OBJS = $(SRCS:.c=.o)
 
-lib/lcd1602.o: lib/lcd1602.c lib/lcd1602.h
-	$(CC) $(CFLAGS) -c $< -o $@
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(OBJS) $(LIBS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	rm -f src/*.o lib/*.o demo
+	rm -f $(OBJS) $(TARGET)

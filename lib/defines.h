@@ -27,16 +27,25 @@
 //=====================
 #define PORT 1883
 #define LOOPBACK "127.0.0.1"
+#define N_TOPICS 10
 
 #define PIOT "/piot"
 #define CONFIG "/config"
 #define SENSORS "/sensor"
-#define APP "/APP"
+#define APP "/app"
+#define ALARM "/alarm"
+#define DOOR_SENSOR "/door"
+#define PRESENCE_SENSOR "/presence"
+#define MQ2_SENSOR "/smoke"
+#define INFO "/info"
+#define READ "/read"
 
-#define ENABLE_ALARM "/enable_alarm"
-#define DISABLE_ALARM "/disable_alarm"
-
-#define 
+//=====================
+//=====MQTT COMMS======
+//========MSGS=========
+//=====================
+#define ENABLE "enable"
+#define DISABLE "disable"
 
 
 
